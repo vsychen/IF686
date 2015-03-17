@@ -1,6 +1,0 @@
-sites.google.com/a/cin.ufpe.br/if686
-Haskell Platform
-ghci
-:l <arquivo>.hs 		-> abrir arquivo
-:t <funcao> 			-> tipo da funcao
-(:) 					-> construtor polimórfico para listas
