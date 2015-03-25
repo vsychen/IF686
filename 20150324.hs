@@ -130,4 +130,60 @@ devolver x p l | x == []                                      = []
                | otherwise                                    = (head x):(devolver (tail x) p l)
 
 -- membro
-membro :: [Int] -> Int -> Bool
+membroR :: [Int] -> Int -> Bool
+membroR x y = [membro | membro <- x, membro == y] /= []
+
+-- livros
+livrosR :: BancoDados -> Pessoa -> [Livro]
+livrosR x y = [livros | (pessoa, livros) <- x, pessoa == y]
+
+-- emprestimos
+emprestimosR :: BancoDados -> Livro -> [Pessoa]
+emprestimosR x y = [pessoa | (pessoa, livro) <- x, livro == y]
+
+-- emprestado
+emprestadoR :: BancoDados -> Livro -> Bool
+emprestadoR x y = [livro | (pessoa, livro) <- x, livro == y] /= []
+
+-- qtdEmprestimos
+qtdEmprestimosR :: BancoDados -> Pessoa -> Int
+qtdEmprestimosR x y = (length [pessoa | (pessoa, livro) <- x, pessoa == y])
+
+-- devolver
+devolverR :: BancoDados -> Livro -> BancoDados
+devolverR x y = [(pessoa, livro) | (pessoa, livro) <- x, livro /= y]
+
+-- quicksort
+quicksortR :: [Int] -> [Int]
+quicksortR x | (length x) <= 1 = x
+            | otherwise = (quicksortR [minor | minor <- (tail x), minor < (head x)]) ++ [head x] ++ (quicksortR [major | major <- (tail x), major >= (head x)])
+
+-- getSpace
+getSpace :: String -> Int
+getSpace x | x == [] = 0
+           | (head x) == ' ' = 0
+           | otherwise = 1 + getSpace (tail x)
+
+-- getWord
+getWord :: String -> String
+getWord x | x == [] = []
+          | otherwise = take (getSpace x) x
+
+-- dropWord
+dropWord :: String -> String
+dropWord x | x == [] = []
+           | otherwise = drop (getSpace x) x
+
+-- dropSpace
+dropSpace :: String -> String
+dropSpace x | x == [] = []
+            | x!!0 /= ' ' = x
+            | otherwise = dropSpace (tail x)
+
+-- splitWords
+splitWords :: String -> [String]
+splitWords x | x == [] = []
+             | ((getSpace x) == 0 && (x!!0 /= ' ')) = (getWord x):[]
+             | otherwise = (getWord x) : (splitWords (dropSpace (dropWord x)))
+
+--
