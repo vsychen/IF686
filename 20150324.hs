@@ -6,6 +6,12 @@
 
 -- Projeto
 -- mergesort
+{-	Complexidade:
+	merge = N, onde N = (length list1) + (length list2)
+	mergesort = log(N)
+
+	Total = merge * mergesort = N*log(N)
+-}
 mergesort :: [Int] -> [Int]
 mergesort a = if (length a) <= 1
               then a
@@ -19,6 +25,17 @@ merge (x:xs) (y:ys) = if (x <= y)
 			else y : merge (x:xs) ys
 
 -- heapsort
+{-	Complexidade: 
+	swap = N
+	large = CONSTANTE
+	largest = CONSTANTE
+	heapify = log(N)
+	buildHeap: N*log(N), n chamadas sobre Heapify
+	hpsort = N*log(N), na chamada de buildHeap
+	heapsort = N*log(N), na chamada de hpsort
+	
+	Total = N*log(N)
+-}
 swap :: Int -> Int -> [Int] -> [Int]
 swap i j xs | i == j    = xs
             | i < j     = (take i xs) ++ ((xs!!j):[]) ++ (drop (i+1) (take j xs)) ++ ((xs!!i):[]) ++ (drop (j+1) xs)
