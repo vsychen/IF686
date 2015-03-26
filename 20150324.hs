@@ -197,10 +197,40 @@ dropSpace x | x == [] = []
             | x!!0 /= ' ' = x
             | otherwise = dropSpace (tail x)
 
+type Word = String
+
 -- splitWords
-splitWords :: String -> [String]
+splitWords :: String -> [Word]
 splitWords x | x == [] = []
              | ((getSpace x) == 0 && (x!!0 /= ' ')) = (getWord x):[]
              | otherwise = (getWord x) : (splitWords (dropSpace (dropWord x)))
 
---
+type Line = [Word]
+
+-- getLine
+getLine :: Int -> [Word] -> Line
+getLine x y | x == 0 || y == [] = []
+            | length (head y) > x = Main.getLine x (tail y)
+            | otherwise = (head y) : Main.getLine (x - (length (head y))) (tail y)
+
+-- dropLine
+dropLine :: Int -> [Word] -> [Word]
+dropLine x y | x == 0 || y == [] = []
+             | length (last y) > x = dropLine x (init y)
+             | otherwise = (dropLine (x - (length (last y))) (init y)) ++ [(last y)]
+
+lineLength = 42
+
+-- splitLines
+splitLines :: [Word] -> [Line]
+splitLines x | x == [] = []
+             | otherwise = (Main.getLine lineLength x) : splitLines (drop 10 x)
+
+-- fill
+fill :: String -> [Line]
+fill x = splitLines (splitWords x)
+
+{-
+-- joinLines
+joinLines :: [Line] -> String
+-}
