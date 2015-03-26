@@ -55,13 +55,13 @@ get ht kk | posGet ht kk 0 0 == -1 = -1
 put :: HashTable -> Int -> Int -> HashTable
 put [] kk vv = [(kk,vv)]
 put ht kk vv | posPut ht kk 0 0 == -1 = ht
-             | otherwise = take (posPut ht kk 0 0) ht ++ (kk, vv) : drop ((posPut ht kk 0 0)+1) ht
+             | otherwise = Prelude.take (posPut ht kk 0 0) ht ++ (kk, vv) : Prelude.drop ((posPut ht kk 0 0)+1) ht
 
 -- remove
 remove :: HashTable -> Int -> HashTable
 remove [] kk = []
 remove ht kk | posGet ht kk 0 0 == -1 = ht
-             | otherwise = take (posGet ht kk 0 0) ht ++ (-1,-1) : drop ((posGet ht kk 0 0)+1) ht
+             | otherwise = Prelude.take (posGet ht kk 0 0) ht ++ (-1,-1) : Prelude.drop ((posGet ht kk 0 0)+1) ht
 
 -- find-position methods
 posPut :: HashTable -> Int -> Int -> Int -> Int
@@ -102,3 +102,41 @@ existe xs s | xs == [] = False
 
 
 -- Exercícios
+-- take
+take :: (Eq t) => [t] -> Int -> [t]
+take x y | x == [] || y == 0 = []
+         | otherwise = (head x) : Main.take (tail x) (y-1)
+
+-- drop
+drop :: (Eq t) => [t] -> Int -> [t]
+drop x y | x == [] = []
+         | x /= [] && y > 0 = Main.drop (tail x) (y-1)
+         | otherwise = (head x) : Main.drop (tail x) y
+
+-- takeWhile
+takeWhile :: (Eq t) => (t -> Bool) -> [t] -> [t]
+takeWhile x y | y == [] = []
+              | x (head y) = (head y) : Main.takeWhile x (tail y)
+              | otherwise = []
+
+-- dropWhile
+dropWhile :: (Eq t) => (t -> Bool) -> [t] -> [t]
+dropWhile x y | y == [] = []
+              | x (head y) == False = Main.dropWhile x (tail y)
+              | otherwise = (Main.drop y 0)
+
+-- order
+order :: (Ord a) => [a] -> [a]
+order x | x == [] = []
+        | otherwise = (order [minor | minor <- (tail x), minor < (head x)]) ++ [head x] ++ (order [major | major <- (tail x), major >= (head x)])
+
+{-
+-- agrupar
+toString :: (Show a) => [a] -> String
+toString x |  x == [] = []
+           | otherwise = show (head x) ++ (toString (tail x))
+
+agrupar :: (Ord a) => [a] -> [a]
+agrupar x | x == [] = []
+          | 
+-}
