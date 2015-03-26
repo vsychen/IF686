@@ -230,7 +230,17 @@ splitLines x | x == [] = []
 fill :: String -> [Line]
 fill x = splitLines (splitWords x)
 
-{-
+
 -- joinLines
+lineToWord :: [Line] -> [Word]
+lineToWord x | x == [] = []
+             | otherwise = (head x) ++ lineToWord (tail x)
+
+wordToString :: [Word] -> String
+wordToString x | x == [] = []
+               | (tail x) == [] = (head x)
+               | otherwise = (head x) ++ " " ++ wordToString (tail x)
+
 joinLines :: [Line] -> String
--}
+joinLines x | x == [] = []
+            | otherwise = wordToString (lineToWord x)
