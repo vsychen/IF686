@@ -130,13 +130,24 @@ order :: (Ord a) => [a] -> [a]
 order x | x == [] = []
         | otherwise = (order [minor | minor <- (tail x), minor < (head x)]) ++ [head x] ++ (order [major | major <- (tail x), major >= (head x)])
 
-{-
+{- Método a ser resolvido.
 -- agrupar
-toString :: (Show a) => [a] -> String
+toString :: (Show a, Eq a) => [a] -> String
 toString x |  x == [] = []
            | otherwise = show (head x) ++ (toString (tail x))
 
-agrupar :: (Ord a) => [a] -> [a]
+count :: String -> Char -> Int
+count x y | x == [] = 0
+          | (head x) == y = 1 + (count (tail x) y)
+          | otherwise = count (tail x) y
+
+removeChar :: String -> Char -> String
+removeChar x y | x == [] = []
+               | (head x) == y = removeChar (tail x) y
+               | otherwise = (head x) : removeChar (tail x) y
+
+agrupar :: (Ord a, Show a) => [a] -> [(Char,Int)]
 agrupar x | x == [] = []
-          | 
+          | otherwise = let arr = toString x
+		                in ((head arr), (count arr (head arr))) : agrupar (removeChar arr (head arr))
 -}
