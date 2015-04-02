@@ -130,24 +130,37 @@ order :: (Ord a) => [a] -> [a]
 order x | x == [] = []
         | otherwise = (order [minor | minor <- (tail x), minor < (head x)]) ++ [head x] ++ (order [major | major <- (tail x), major >= (head x)])
 
-{- Método a ser resolvido.
 -- agrupar
-toString :: (Show a, Eq a) => [a] -> String
-toString x |  x == [] = []
-           | otherwise = show (head x) ++ (toString (tail x))
+agruparGet :: (Eq t) => [t] -> [(t, Int)]
+agruparGet x | x == [] = []
+      | otherwise = [((head x), 0)] ++ (agruparGet (tail x))
 
-count :: String -> Char -> Int
+count :: (Eq t) => [(t, Int)] -> t -> Int
 count x y | x == [] = 0
-          | (head x) == y = 1 + (count (tail x) y)
-          | otherwise = count (tail x) y
+          | fst (head x) == y = 1 + (count (tail x) y)
+          | otherwise = (count (tail x) y)
 
-removeChar :: String -> Char -> String
-removeChar x y | x == [] = []
-               | (head x) == y = removeChar (tail x) y
-               | otherwise = (head x) : removeChar (tail x) y
+add :: (Eq t) => [(t, Int)] -> [(t, Int)]
+add x | x == [] = []
+      | otherwise = (fst (head x), count x (fst (head x))) : add (tail x)
 
-agrupar :: (Ord a, Show a) => [a] -> [(Char,Int)]
+removeChunk :: (Eq t) => [(t, Int)] -> t -> [(t, Int)]
+removeChunk x y | x == [] = []
+                | fst (head x) == y = removeChunk (tail x) y
+                | otherwise = (head x) : removeChunk (tail x) y
+
+agruparRemove :: (Eq t) => [(t, Int)] -> [(t, Int)]
+agruparRemove x | x == [] = []
+         | otherwise = (head x) : agruparRemove (removeChunk (tail x) (fst (head x)))
+
+mapFunction :: (Eq t) => (t -> u) -> [t] -> [u]
+mapFunction f x | x == [] = []
+                | otherwise = (f (head x)) : mapFunction f (tail x)
+
+concatenate :: (Eq t) => [[t]] -> [t]
+concatenate x | x == [] = []
+              | otherwise = (head x) ++ concatenate (tail x)
+
+agrupar :: (Eq t) => [[t]] -> [(t, Int)]
 agrupar x | x == [] = []
-          | otherwise = let arr = toString x
-		                in ((head arr), (count arr (head arr))) : agrupar (removeChar arr (head arr))
--}
+          | otherwise = agruparRemove (add (concatenate (mapFunction (agruparGet) x)))
