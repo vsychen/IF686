@@ -5,6 +5,7 @@
 
 ---------------------------------------------------------------------------------------------
 
+-- Trabalho
 {-Trabalho 4, Questão 1-}
 	{- Questão Teórica / Overloading -}
 
@@ -138,3 +139,30 @@ mediana :: [Int] -> Int
 mediana [] = 0
 mediana ls | mod (length ls) 2 == 0 = div(ls!!(div (length ls) 2) + ls!!((div (length ls) 2) - 1)) 2
            | otherwise = ls!!(div (length ls) 2)
+
+-- Exercícios
+-- verifyAFD
+getFst :: (Int, Int, Char) -> Int
+getFst (x,y,z) = x
+
+getSnd :: (Int, Int, Char) -> Int
+getSnd (x,y,z) = y
+
+getTrd :: (Int, Int, Char) -> Char
+getTrd (x,y,z) = z
+
+getTransition :: [(Int, Int, Char)] -> Int -> Char -> Int
+getTransition t i s | t == [] = -1
+                    | (getFst (head t)) == i && (getTrd (head t)) == s = getSnd (head t)
+                    | otherwise = getTransition (tail t) i s
+
+check :: [Int] -> Int -> Bool
+check x y | x == [] = False
+          | (head x) == y = True
+          | otherwise = check (tail x) y
+
+verifyAFD :: String -> [Int] -> [(Int, Int, Char)] -> Int -> [Int] -> Bool
+verifyAFD s e t i f | s == "" = (check f i)
+                    | otherwise = verifyAFD (tail s) e t (getTransition t i (head s)) f
+
+-- 
