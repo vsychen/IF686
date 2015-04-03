@@ -165,4 +165,96 @@ verifyAFD :: String -> [Int] -> [(Int, Int, Char)] -> Int -> [Int] -> Bool
 verifyAFD s e t i f | s == "" = (check f i)
                     | otherwise = verifyAFD (tail s) e t (getTransition t i (head s)) f
 
--- 
+-- somatorioHexadecimal
+baseHD :: [(Char, Int)]
+baseHD = [('0',0),('1',1),('2',2),('3',3),('4',4),('5',5),('6',6),('7',7),('8',8),('9',9),('A',10),('B',11),('C',12),('D',13),('E',14),('F',15)]
+
+pow :: Int -> Int -> Int
+pow x y | y == 0 = 1
+        | otherwise = x * pow x (y - 1)
+
+divHex :: Int -> Int
+divHex x | x < 16 = 0
+         | otherwise = 1 + (divHex (x - 16))
+
+modHex :: Int -> Int
+modHex x | x < 16 = x
+         | otherwise = modHex (x - 16)
+
+getDec :: [(Char, Int)] -> Char -> Int
+getDec base x | base == [] = -1
+              | (fst (head base)) == x = (snd (head base))
+              | otherwise = getDec (tail base) x
+
+getHex :: [(Char, Int)] -> Int -> Char
+getHex base x | (snd (head base)) == x = (fst (head base))
+              | otherwise = getHex (tail base) x
+
+hexToDec :: String -> Int -> Int
+hexToDec x y | x == [] = 0
+             | otherwise = ((getDec baseHD (last x)) * (pow 16 y)) + hexToDec (init x) (y + 1)
+
+decToHex :: Int -> String
+decToHex x | x == 0 = []
+           | otherwise = (decToHex (divHex x)) ++ [getHex baseHD (modHex x)]
+
+sum :: [Int] -> Int
+sum x | x == [] = 0
+      | otherwise = (head x) + Main.sum (tail x)
+
+aux :: [String] -> [Int]
+aux x | x == [] = []
+      | otherwise = [hexToDec (head x) 0] ++ aux (tail x)
+
+somatorioHexadecimal :: [String] -> String
+somatorioHexadecimal x | x == [] = []
+                       | otherwise = decToHex (Main.sum (aux x))
+
+-- palindromoDecimal
+-- Obs.: Utiliza baseHD, pow e hexToDec do método acima
+baseDD :: [(Char, Int)]
+baseDD = [('0',0),('1',1),('2',2),('3',3),('4',4),('5',5),('6',6),('7',7),('8',8),('9',9)]
+
+getInt :: [(Char, Int)] -> Char -> Int
+getInt base x | base == [] = -1
+              | (fst (head base)) == x = (snd (head base))
+              | otherwise = getInt (tail base) x
+
+getChar :: [(Char, Int)] -> Int -> Char
+getChar base x | (snd (head base)) == x = (fst (head base))
+               | otherwise = Main.getChar (tail base) x
+
+intToString :: Int -> String
+intToString x | x < 10 = [Main.getChar baseDD x]
+              | otherwise = (intToString (div x 10)) ++ [Main.getChar baseDD (mod x 10)]
+
+isPal :: String -> Bool
+isPal x = if (length x) <= 1 then True
+          else if (head x) /= (last x) then False
+          else True && isPal (tail (init x))
+
+palindromoDecimal :: String -> String
+palindromoDecimal x = if (x == []) then []
+                      else if (isPal decX == False) then decX ++ " - NAO-PALINDROMO"
+                      else decX ++ " - PALINDROMO"
+                           where decX = (intToString (hexToDec x 0))
+
+-- multiplicaMatrizes
+type Vector = [Double]
+type Matrix = [Vector]
+
+multElement :: Matrix -> Matrix -> Int -> Int -> Int -> Double
+multElement m n a b c | m == [] || n == [] || b == -1 = 0
+                      | otherwise = (((m!!a)!!b) * ((n!!b)!!c)) + (multElement m n a (b - 1) c)
+
+multRow :: Matrix -> Matrix -> Int -> Int -> Vector
+multRow m n x y | m == [] || n == [] || y == (length m) = []
+                | otherwise = [multElement m n x (length m - 1) y] ++ (multRow m n x (y + 1))
+
+auxMatrix :: Matrix -> Matrix -> Int -> Matrix
+auxMatrix m n x | m == [] || n == [] || x == (length m) = []
+          | otherwise = [multRow m n x 0] ++ (auxMatrix m n (x + 1))
+
+multiplicaMatrizes :: Matrix -> Matrix -> Matrix
+multiplicaMatrizes a b | (length a) == 0 || (length b) == 0 = []
+                       | otherwise = auxMatrix a b 0
