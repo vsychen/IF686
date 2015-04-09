@@ -62,3 +62,65 @@ makeBool g = False : makeBool (tail(g))
 turnBool :: [Bool] -> Int -> [Bool]
 turnBool [] n = []
 turnBool b n = (take n b) ++ [True] ++ (drop (n+1) b)
+
+-- Exercícios
+-- mapSqrTwo
+sqrtTwo :: Float -> Float
+sqrtTwo x = x ** (0.5)
+
+mapSqrtTwo :: (Float -> Float) -> [Float] -> [Float]
+mapSqrtTwo f x | x == [] = []
+               | otherwise = (f (head x)) : mapSqrtTwo f (tail x)
+
+-- posicaoAlfabeto
+baseAlphabet :: [(Char, Int)]
+baseAlphabet = [('a',1),('b',2),('c',3),('d',4),('e',5),('f',6),('g',7),('h',8),('i',9),('j',10),('k',11),('l',12),('m',13),('n',14),('o',15),('p',16),('q',17),('r',18),('s',19),('t',20),('u',21),('v',22),('w',23),('x',24),('y',25),('z',26)]
+
+getPos :: [(Char, Int)] -> Char -> Int
+getPos abc x | x == (fst (head abc)) = snd (head abc)
+             | otherwise = getPos (tail abc) x
+
+posicaoAlfabeto :: ([(Char, Int)] -> Char -> Int) -> [Char] -> [Int]
+posicaoAlfabeto f x | x == [] = []
+                    | otherwise = (f baseAlphabet (head x)) : (posicaoAlfabeto f (tail x))
+
+-- mapCL
+mapCL :: (t -> t) -> [t] -> [t]
+mapCL f x = [(f new) | new <- x]
+
+-- member
+member :: (Eq t) => [t] -> t -> Bool
+member l e = foldr (||) False (map (== e) l)
+
+-- union
+exists :: (Eq t) => [t] -> t -> Bool
+exists l e | l == [] = False
+           | (head l) == e = True
+           | otherwise = exists (tail l) e
+
+kickEq :: (Eq t) => [t] -> [t] -> [t]
+kickEq l1 l2 | l1 == [] || l2 == [] = []
+             | exists l1 (head l2) = kickEq l1 (tail l2)
+             | otherwise = (head l2) : kickEq l1 (tail l2)
+
+group :: [t] -> [t] -> [[t]]
+group l1 l2 = l1 : [l2]
+
+union :: (Eq t) => [t] -> [t] -> [t]
+union l1 l2 = foldr (++) [] (group l1 (kickEq l1 l2))
+
+-- countString
+-- Utiliza getPos e baseAlphabet do grupo de funcoes de posicaoAlfabeto
+charToInt :: Char -> Int
+charToInt x = getPos baseAlphabet x
+
+stringToInt :: String -> Int
+stringToInt s = foldr (+) 0 (map (charToInt) s)
+
+countString :: [String] -> [Int]
+countString l = [stringToInt x | x <- l]
+
+{-
+-- insertNode
+insertNode :: (Eq t) => Tree t -> t -> Tree t
+-}

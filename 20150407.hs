@@ -55,7 +55,17 @@ toList :: List t -> [t]
 toList (Nil) = []
 toList (Cons x (xs)) = x : toList xs
 
--- fromList **atualizar
+-- fromList
 fromList :: [t] -> List t
-fromList [] = "Nil"
-fromList (x:xs) = "Cons" ++ (show x) ++ (fromList xs)
+fromList [] = Nil
+fromList (x:xs) = Cons x (fromList xs)
+
+-- depth
+max :: Int -> Int -> Int
+max x y = if (x >= y) then x
+          else y
+
+depth :: Tree t -> Int
+depth (NilT) = 0
+depth (Node t t1 t2) = 1 + Main.max (depth t1) (depth t2)
+
