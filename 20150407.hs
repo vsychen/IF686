@@ -69,3 +69,22 @@ depth :: Tree t -> Int
 depth (NilT) = 0
 depth (Node t t1 t2) = 1 + Main.max (depth t1) (depth t2)
 
+-- collapse
+collapse :: Tree t -> [t]
+collapse (NilT) = []
+collapse (Node x (NilT) (NilT)) = [x]
+collapse (Node x t1 (NilT)) = [x] ++ (collapse t1)
+collapse (Node x (NilT) t2) = [x] ++ (collapse t2)
+collapse (Node x t1 t2) = [x] ++ (collapse t1) ++ (collapse t2)
+
+-- bsf
+bsf :: (Ord t) => Tree t -> t -> Bool
+bsf (NilT) _ = False
+bsf (Node x a b) n = if x == n then True
+                     else if n < x then bsf a n
+                     else bsf b n
+
+-- mapTree
+mapTree :: (t -> u) -> Tree t -> Tree u
+mapTree f (NilT) = NilT
+mapTree f (Node x a b) = (Node (f x) (mapTree f a) (mapTree f b))
