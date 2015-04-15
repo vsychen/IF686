@@ -7,37 +7,52 @@
 
 {-Trabalho 6, Questão 1-}
     {-Eq and Show Graph-}
+type Node t = t
+type Edge t = (Node t, Node t, Int)
 data Graph t = NilG
-               | Node t [(t, Int)] (Graph t)
+               | Graph [Node t] [Edge t]
 
-checkTerm :: (Eq t) => [(t, Int)] -> (t, Int) -> Bool
-checkTerm list x | list == [] = False
-                 | (head list) == x = True
-                 | otherwise = checkTerm (tail list) x
+cNode :: (Eq t) => [Node t] -> Node t -> Bool
+cNode nodes n | nodes == [] = False
+              | (head nodes) == n = True
+              | otherwise = cNode (tail nodes) n
 
-contains :: (Eq t) => [(t, Int)] -> [(t, Int)] -> Bool
-contains [] [] = True
-contains [] y = False
-contains x [] = False
-contains (x:xs) y | xs == [] = (checkTerm y x)
-               | otherwise = (checkTerm y x) && (contains xs y)
+eNode :: (Eq t) => [Node t] -> [Node t] -> Bool
+eNode [] [] = True
+eNode n1 n2 | n1 == [] || n2 == [] = False
+            | (tail n2) == [] = cNode n1 (head n2)
+            | otherwise = (cNode n1 (head n2)) && (eNode n1 (tail n2))
 
-check :: (Eq t) => [(t, Int)] -> [(t, Int)] -> Bool
-check x y = contains x y && contains y x
+cEdge :: (Eq t) => [Edge t] -> Edge t -> Bool
+cEdge edges e | edges == [] = False
+              | (head edges) == e = True
+              | otherwise = cEdge (tail edges) e
 
-compareGraph :: (Eq t) => Graph t -> Graph t -> Bool
-compareGraph (NilG) (NilG) = True
-compareGraph (NilG) (Node _ _ _) = False
-compareGraph (Node _ _ _) (NilG) = False
-compareGraph (Node id1 list1 graph1) (Node id2 list2 graph2) = (id1 == id2) && (check list1 list2) && (compareGraph graph1 graph2)
+eEdge :: (Eq t) => [Edge t] -> [Edge t] -> Bool
+eEdge [] [] = True
+eEdge e1 e2 | e1 == [] || e2 == [] = False
+            | (tail e2) == [] = cEdge e1 (head e2)
+            | otherwise = (cEdge e1 (head e2)) && (eEdge e1 (tail e2))
 
-showList :: (Show t) => [(t, Int)] -> String
-showList [] = ""
-showList ((n, w):xs) = (" - " ++ (show n) ++ " " ++ (show w)) ++ Main.showList xs
+equal :: (Eq t) => Graph t -> Graph t -> Bool
+equal (NilG) (NilG) = True
+equal _ (NilG) = False
+equal (NilG) _ = False
+equal (Graph n1 e1) (Graph n2 e2) = (eNode n1 n2) && (eNode n2 n1) && (eEdge e1 e2) && (eEdge e2 e1)
 
-showGraph :: (Show t) => Graph t -> String
+showNode :: (Eq t, Show t) => [Node t] -> String
+showNode [] = []
+showNode n = if tail n == [] then show (head n)
+             else show (head n) ++ " " ++ showNode (tail n)
+
+showEdge :: (Eq t, Show t) => [Edge t] -> String
+showEdge [] = []
+showEdge ((t1, t2, d):es) = if es == [] then "(" ++ (show t1) ++ " " ++ (show t2) ++ " " ++ (show d) ++ ")"
+                                    else "(" ++ (show t1) ++ " " ++ (show t2) ++ " " ++ (show d) ++ ") " ++ showEdge es
+
+showGraph :: (Eq t, Show t) => Graph t -> String
 showGraph (NilG) = ""
-showGraph (Node id list graph) = ((show id) ++ (Main.showList list)) ++ ". " ++ showGraph graph
+showGraph (Graph n e) = "Nodes: (" ++ showNode n ++ ") Edges: (" ++ showEdge e ++ ")"
 
 {-Trabalho 6, Questão 2-}
 	{-DFS in Graph-}
