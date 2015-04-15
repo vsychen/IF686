@@ -11,32 +11,39 @@ compose :: (u -> v) -> [(t -> u)] -> [(t -> v)]
 compose f fl = [f . (head fl)] ++ (compose f (tail fl))
 
 	{-map and fold graph-}
+type Node t = t
+type Edge t = (Node t, Node t, Int)
 data Graph t = NilG
-               | Node t [(t, Int)] (Graph t)
+               | Graph [Node t] [Edge t] deriving (Eq, Show)
 
-mapList :: [(t, Int)] -> (t -> u) -> [(u, Int)]
-mapList [] _ = []
-mapList (x:xs) f = (f (fst x), (snd x)) : mapList xs f
+mapNode :: [Node t] -> (t -> u) -> [Node u]
+mapNode [] _ = []
+mapNode (x:xs) f = (f x) : mapNode xs f
+
+mapEdge :: [Edge t] -> (t -> u) -> [Edge u]
+mapEdge [] _ = []
+mapEdge ((x1, x2, d):xs) f = ((f x1), (f x2), d) : (mapEdge xs f)
 
 mapGraph :: Graph t -> (t -> u) -> Graph u
 mapGraph (NilG) _ = (NilG)
-mapGraph (Node x l g) f = Node (f x) (mapList l f) (mapGraph g f)
+mapGraph (Graph n e) f = Graph (mapNode n f) (mapEdge e f)
 
-auxF :: (Num t) => Graph t -> [t]
-auxF (NilG) = []
-auxF (Node x l g) = [x] ++ (auxF g)
+foldrNode :: (Eq t) => [Node t] -> u -> (t -> u -> u) -> u
+foldrNode x b f = if x == [] then b
+                  else f (head x) (foldrNode (tail x) b f)
 
-foldGraph :: (Num t) => Graph t -> (t -> t -> t) -> t -> t
-foldGraph (NilG) _ i = i
-foldGraph x f i = foldr f i (auxF x)
+foldrGraph :: (Eq t) => Graph t -> u -> (t -> u -> u) -> u
+foldrGraph (NilG) b _ = b
+foldrGraph (Graph n e) b f = foldrNode n b f
+{-
+	{-filterTree-}
+data Tree t = NilT
+              | Node t (Tree t) (Tree t) deriving (Eq, Show)
 
--- graph's checking function
-showList :: (Show t) => [(t, Int)] -> String
-showList [] = ""
-showList ((n, w):xs) = (" - " ++ (show n) ++ " " ++ (show w)) ++ Main.showList xs
+--
 
-showGraph :: (Show t) => Graph t -> String
-showGraph (NilG) = ""
-showGraph (Node id list graph) = ((show id) ++ (Main.showList list)) ++ ". " ++ showGraph graph
 
-	{-binaryTreeFilter-}
+filterTree :: (Ord t) => Tree t -> (t -> Bool) -> [Tree t]
+filterTree (NilT) _ = []
+filterTree (Node x t1 t2) = 
+-}

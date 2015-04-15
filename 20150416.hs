@@ -7,15 +7,14 @@
 
 {-Trabalho 8, Questão 1-}
     {-listPartitioner-}
-
 quicksort :: [Int] -> [Int]
 quicksort [] = []
 quicksort (x:xs) = (quicksort [min | min <- xs, min < x]) ++ [x] ++ (quicksort [maj | maj <- xs, maj > x])
 
 func :: [Int] -> [Int] -> [[Int]]
 func [] l = []
-func (x:xs) l = if xs /= [] then [[min | min <- l, min <= x]] ++ func xs [maj | maj <- l, maj > x]
-                else [[min | min <- l, min <= x]] ++ [[max | max <- l, max > x]]
+func (x:xs) l = if xs /= [] then [quicksort [min | min <- l, min <= x]] ++ func xs [maj | maj <- l, maj > x]
+                else [quicksort [min | min <- l, min <= x]] ++ [quicksort [max | max <- l, max > x]]
 
 listPartitioner :: [Int] -> ([Int] -> [[Int]])
 listPartitioner [] = func []
