@@ -20,3 +20,30 @@ listPartitioner :: [Int] -> ([Int] -> [[Int]])
 listPartitioner [] = func []
 listPartitioner x = func (quicksort x)
 
+-- Exercícios
+-- invertF
+invertF :: (t -> u -> v) -> (u -> t -> v)
+invertF f = \x y -> f y x
+
+-- firstEl
+firstEl :: ([(t,t)] -> [t])
+firstEl = (\x -> map (fst) x)
+
+-- lengthGreaterThan
+lengthGreaterThan :: ([[t]] -> Int -> [[t]])
+lengthGreaterThan = \x y -> filter ((>y).length) x
+
+-- 
+
+-- sumX
+sum :: (Num t) => t -> t -> t
+sum x y = x + y
+
+sumX :: (Num t) => t -> ([t] -> [t])
+sumX n = map (Main.sum n)
+
+-- maxEl
+maxEl :: (Ord t) => ([t] -> t)
+maxEl = maximum
+
+-- 
