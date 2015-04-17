@@ -5,22 +5,31 @@
 
 ---------------------------------------------------------------------------------------------
 
-{-Trabalho 8, Questão 1-}
-    {-listPartitioner-}
-quicksort :: [Int] -> [Int]
-quicksort [] = []
-quicksort (x:xs) = (quicksort [min | min <- xs, min < x]) ++ [x] ++ (quicksort [maj | maj <- xs, maj > x])
+{-Trabalho 9, Questão 1-}
+-- Slide da Aula 02
+-- joinLines
+joinWords :: [Word] -> String
+joinWords x | x == [] = []
+            | otherwise = (head x) ++ (joinWords (tail x))
 
-func :: [Int] -> [Int] -> [[Int]]
-func [] l = []
-func (x:xs) l = if xs /= [] then [quicksort [min | min <- l, min <= x]] ++ func xs [maj | maj <- l, maj > x]
-                else [quicksort [min | min <- l, min <= x]] ++ [quicksort [max | max <- l, max > x]]
+joinLines :: [Line] -> String
+joinLines x | x == [] = []
+            | otherwise = (joinWords (head x)) ++ (joinLines (tail x))
 
-listPartitioner :: [Int] -> ([Int] -> [[Int]])
-listPartitioner [] = func []
-listPartitioner x = func (quicksort x)
+-- Slide da Aula 05
+-- inter
+inter :: (Eq t) => [t] -> [t] -> [t]
+inter l1 l2 = filter (\x -> elem x l2) l1
 
--- Exercícios
+-- diff
+diff :: (Eq t) => [t] -> [t] -> [t]
+diff l1 l2 = filter (\x -> not (elem x l2)) l1
+
+-- mapFilter
+mapFilter :: (t -> Bool) -> [[t]] -> [[t]]
+mapFilter _ [] = []
+mapFilter f (x:xs) = [el | el <- x, f el == True] : mapFilter f xs
+
 -- invertF
 invertF :: (t -> u -> v) -> (u -> t -> v)
 invertF f = \x y -> f y x
@@ -46,15 +55,5 @@ aux x = if x == [] then []
 joinList :: (Eq t, Ord t) => ([[t]] -> [t])
 joinList = \x -> foldr (++) [] (aux x)
 
--- sumX
-sum :: (Num t) => t -> t -> t
-sum x y = x + y
 
-sumX :: (Num t) => t -> ([t] -> [t])
-sumX n = map (Main.sum n)
 
--- maxEl
-maxEl :: (Ord t) => ([t] -> t)
-maxEl = maximum
-
--- 

@@ -47,3 +47,21 @@ filterTree :: (Ord t) => Tree t -> (t -> Bool) -> [Tree t]
 filterTree (NilT) _ = []
 filterTree (Node x t1 t2) = 
 -}
+
+-- Exercícios
+-- filterList
+filterList :: [[Int]] -> Int -> [[Int]]
+filterList x e = filter (\x -> (foldr (+) 0 x) > e) x
+
+-- inter
+inter :: (Eq t) => [t] -> [t] -> [t]
+inter l1 l2 = filter (\x -> elem x l2) l1
+
+-- diff
+diff :: (Eq t) => [t] -> [t] -> [t]
+diff l1 l2 = filter (\x -> not (elem x l2)) l1
+
+-- mapFilter
+mapFilter :: (t -> Bool) -> [[t]] -> [[t]]
+mapFilter _ [] = []
+mapFilter f (x:xs) = [el | el <- x, f el == True] : mapFilter f xs

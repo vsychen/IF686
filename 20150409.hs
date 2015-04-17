@@ -135,7 +135,14 @@ stringToInt s = foldr (+) 0 (map (charToInt) s)
 countString :: [String] -> [Int]
 countString l = [stringToInt x | x <- l]
 
-{-
 -- insertNode
-insertNode :: (Eq t) => Tree t -> t -> Tree t
--}
+data Tree t = NilT | Node t (Tree t) (Tree t) deriving (Eq, Show)
+
+insertNode :: (Ord t) => Tree t -> t -> Tree t
+insertNode (NilT) n = (Node n (NilT) (NilT))
+insertNode (Node x a b) n = if n >= x then (Node x a (insertNode b n))
+                            else (Node x (insertNode a n) b)
+
+-- criarArvore
+criarArvore :: (Ord t) => [t] -> (Tree t -> t -> Tree t) -> Tree t
+criarArvore li _ = foldr (\x t -> insertNode t x) (NilT) (reverse li)
