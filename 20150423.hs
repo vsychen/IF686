@@ -55,5 +55,29 @@ aux x = if x == [] then []
 joinList :: (Eq t, Ord t) => ([[t]] -> [t])
 joinList = \x -> foldr (++) [] (aux x)
 
+-- mapFold
+myFold :: (t -> u -> u) -> u -> [t] -> u
+myFold _ b [] = b
+myFold f b (x:xs) = f x (myFold f b xs)
 
+mapFold :: (t -> u -> u) -> [u] -> [[t] -> u]
+mapFold _ [] = []
+mapFold f l = (\x -> myFold f (head l) x) : mapFold f (tail l)
+
+-- Slide da Aula 06
+-- isomorficas
+data BTree t = NilBT
+          | Node t (BTree t) (BTree t) deriving (Eq, Show)
+
+isomorficas :: (Eq t) => BTree t -> (BTree t -> Bool)
+isomorficas (NilBT) = (== (NilBT))
+isomorficas x = (== (x)) -- isso aqui é falho
+
+-- createPair
+pair :: (Eq t) => [t] -> [t] -> [(t,t)]
+pair x y | x == [] || y == [] = []
+         | otherwise = ((head x), (head y)) : pair (tail x) (tail y)
+
+createPair :: (Eq t) => [t] -> ([t] -> [(t,t)])
+createPair l = \x -> pair l x
 
