@@ -8,6 +8,9 @@
 {-Trabalho 9, Questão 1-}
 -- Slide da Aula 02
 -- joinLines
+type Word = String
+type Line = [Word]
+
 joinWords :: [Word] -> String
 joinWords x | x == [] = []
             | otherwise = (head x) ++ (joinWords (tail x))
@@ -69,9 +72,20 @@ mapFold f l = (\x -> myFold f (head l) x) : mapFold f (tail l)
 data BTree t = NilBT
           | Node t (BTree t) (BTree t) deriving (Eq, Show)
 
+getNode :: (Eq t) => BTree t -> t
+getNode (Node t _ _) = t
+
+getEsq :: (Eq t) => BTree t -> BTree t
+getEsq (Node _ e _) = e
+
+getDir :: (Eq t) => BTree t -> BTree t
+getDir (Node _ _ d) = d
+
 isomorficas :: (Eq t) => BTree t -> (BTree t -> Bool)
 isomorficas (NilBT) = (== (NilBT))
-isomorficas x = (== (x)) -- isso aqui é falho
+isomorficas (Node _ e d) = (\x -> (x /= (NilBT)) && ((normal x) || (inverted x)))
+                           where normal x = (((isomorficas e) (getEsq x)) && ((isomorficas d) (getDir x)))
+                                 inverted x = (((isomorficas e) (getDir x)) && ((isomorficas d) (getEsq x)))
 
 -- createPair
 pair :: (Eq t) => [t] -> [t] -> [(t,t)]
