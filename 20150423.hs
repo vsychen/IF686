@@ -72,9 +72,6 @@ mapFold f l = (\x -> myFold f (head l) x) : mapFold f (tail l)
 data BTree t = NilBT
           | Node t (BTree t) (BTree t) deriving (Eq, Show)
 
-getNode :: (Eq t) => BTree t -> t
-getNode (Node t _ _) = t
-
 getEsq :: (Eq t) => BTree t -> BTree t
 getEsq (Node _ e _) = e
 
