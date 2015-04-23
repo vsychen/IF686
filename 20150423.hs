@@ -136,3 +136,30 @@ geraFuncaoMenorCaminho g i e = (show i) ++ " " ++ (show e) ++ " - " ++ (show (mi
                                where m = createMatrix g
 
 -- geraFuncaoMenorCaminho (Graph [1,2,3,4] [(1,2,5),(2,4,4),(1,3,1),(3,4,1)]) 1 4
+
+-- Exercícios
+{-
+Determine, sem usar o GHCi, os tipos das seguintes expressões:
+map :: (a -> b) -> [a] -> [b]
+filter :: (a -> Bool) -> [a] -> [a]
+foldr :: (a -> b -> b) -> b -> [a] -> b
+(:) :: a -> [a] -> [a]
+(.) :: (b -> c) -> (a -> b) -> (a -> c)
+(+) :: Num a => a -> a -> a
+(++) :: [a] -> [a] -> [a]
+$ :: (a -> b) -> a -> b
+(!!) :: [a] -> Int -> a
+
+1) foldr (:)
+
+2) map.(.)
+
+3) foldr (+).(.).map
+
+4) map.map.foldr
+
+5) map.((.) (foldr (++) (foldr (++) [] [[1], [2]])))
+
+6) (foldr).(.)$(!!)
+
+-}
