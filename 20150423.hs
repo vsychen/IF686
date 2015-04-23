@@ -67,6 +67,9 @@ mapFold :: (t -> u -> u) -> [u] -> [[t] -> u]
 mapFold _ [] = []
 mapFold f l = (\x -> myFold f (head l) x) : mapFold f (tail l)
 
+-- teste: map ($[3,4,5]) ((mapFold) (+) [0,1,2])
+-- resultado: [12,13,14]
+
 -- Slide da Aula 06
 -- isomorficas
 data BTree t = NilBT
@@ -101,13 +104,12 @@ data Graph t = NilG
 
 ordEdge :: [Edge Int] -> [Edge Int]
 ordEdge [] = []
-ordEdge ((x1,x2,d):xs) = if x1 < x2 then ((x1 - 1),(x2 - 1),d):(ordEdge xs)
-                         else ((x2 - 1),(x1 - 1),d):(ordEdge xs)
+ordEdge ((x1,x2,d):xs) = [((x1 - 1),(x2 - 1),d),((x2 - 1),(x1 - 1),d)] ++ (ordEdge xs)
 
 newRow :: Int -> Int -> [Int]
 newRow l c = if l == 0 then []
              else if l == c then 0 : (newRow (l - 1) c)
-             else (-1) : (newRow (l - 1) c)
+             else (99) : (newRow (l - 1) c)
 
 newMatrix :: Int -> Int -> [[Int]]
 newMatrix l c = if c == 0 then []
@@ -124,7 +126,7 @@ createMatrix :: Graph Int -> [[Int]]
 createMatrix (NilG) = []
 createMatrix (Graph n e) = origDist (newMatrix (length n) (length n)) (ordEdge e)
 
-minDist :: [[Int]] -> Int -> Int -> Int -> Int --falho
+minDist :: [[Int]] -> Int -> Int -> Int -> Int
 minDist m i j 0 = (m!!(i - 1))!!(j - 1)
 minDist m i j k = min (minDist m i j (k - 1)) ((minDist m i k (k - 1)) + (minDist m k j (k - 1)))
 

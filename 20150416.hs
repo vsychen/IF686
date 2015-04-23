@@ -55,6 +55,9 @@ mapFold :: (t -> u -> u) -> [u] -> [[t] -> u]
 mapFold _ [] = []
 mapFold f l = (\x -> myFold f (head l) x) : mapFold f (tail l)
 
+-- teste: map ($[3,4,5]) ((mapFold) (+) [0,1,2])
+-- resultado: [12,13,14]
+
 -- sumX
 sum :: (Num t) => t -> t -> t
 sum x y = x + y
