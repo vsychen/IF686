@@ -92,3 +92,45 @@ pair x y | x == [] || y == [] = []
 createPair :: (Eq t) => [t] -> ([t] -> [(t,t)])
 createPair l = \x -> pair l x
 
+{-Trabalho 9, Questão 2-}
+	{-geraFuncaoMenorCaminho-}
+type Node t = t
+type Edge t = (Node t, Node t, Int)
+data Graph t = NilG
+               | Graph [Node t] [Edge t] deriving (Eq, Show)
+
+ordEdge :: [Edge Int] -> [Edge Int]
+ordEdge [] = []
+ordEdge ((x1,x2,d):xs) = if x1 < x2 then ((x1 - 1),(x2 - 1),d):(ordEdge xs)
+                         else ((x2 - 1),(x1 - 1),d):(ordEdge xs)
+
+newRow :: Int -> Int -> [Int]
+newRow l c = if l == 0 then []
+             else if l == c then 0 : (newRow (l - 1) c)
+             else (-1) : (newRow (l - 1) c)
+
+newMatrix :: Int -> Int -> [[Int]]
+newMatrix l c = if c == 0 then []
+                else (newRow l c) : (newMatrix l (c - 1))
+
+calcPos :: [[Int]] -> Edge Int -> [[Int]]
+calcPos m (i, e, d) = (take i m) ++ [((take e (m!!i)) ++ [d] ++ (drop (e + 1) (m!!i)))] ++ (drop (i + 1) m)
+
+origDist :: [[Int]] -> [Edge Int] -> [[Int]]
+origDist m [] = m
+origDist m e = origDist (calcPos m (head e)) (tail e)
+
+createMatrix :: Graph Int -> [[Int]]
+createMatrix (NilG) = []
+createMatrix (Graph n e) = origDist (newMatrix (length n) (length n)) (ordEdge e)
+
+minDist :: [[Int]] -> Int -> Int -> Int -> Int --falho
+minDist m i j 0 = (m!!(i - 1))!!(j - 1)
+minDist m i j k = min (minDist m i j (k - 1)) ((minDist m i k (k - 1)) + (minDist m k j (k - 1)))
+
+geraFuncaoMenorCaminho :: Graph Int -> Int -> Int -> String
+geraFuncaoMenorCaminho (NilG) _ _ = ""
+geraFuncaoMenorCaminho g i e = (show i) ++ " " ++ (show e) ++ " - " ++ (show (minDist m i e (length m)))
+                               where m = createMatrix g
+
+-- geraFuncaoMenorCaminho (Graph [1,2,3,4] [(1,2,5),(2,4,4),(1,3,1),(3,4,1)]) 1 4

@@ -1,0 +1,16 @@
+	Slide da Aula 02
+joinLines
+
+	Slide da Aula 05
+inter
+diff
+mapFilter
+invertF
+firstEl
+lengthGreaterThan
+joinList
+mapFold
+
+	Slide da Aula 06
+isomorficas
+createPair
