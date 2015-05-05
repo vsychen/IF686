@@ -1,3 +1,10 @@
+-- Universidade Federal de Pernambuco
+-- Centro de Informática (CIn)
+-- Alunos: Victor Sin Yu Chen & Lucas de Souza Albuquerque
+-- Login: vsyc & lsa2
+
+---------------------------------------------------------------------------------------------
+-- Exercícios
 import Control.Monad
 
 data Failable t = Error String | Value t deriving (Show)
