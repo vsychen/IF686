@@ -38,25 +38,34 @@ splitWords x | x == [] = []
              | ((getSpace x) == 0 && (x!!0 /= ' ')) = (getWord x):[]
              | otherwise = (getWord x) : (splitWords (dropSpace (dropWord x)))
 
-strCheck :: String -> [Maybe Char]
+check :: String -> Bool
+check [] = False
+check (s:[]) = ((fromEnum s) > 64 && (fromEnum s) < 91) || ((fromEnum s) > 96 && (fromEnum s) < 123)
+check (s:ss) = (((fromEnum s) > 64 && (fromEnum s) < 91) || ((fromEnum s) > 96 && (fromEnum s) < 123)) && (check ss)
+
+strCheck :: [String] -> [Maybe String]
 strCheck [] = [Nothing]
-strCheck (s:ss) = if ((fromEnum s) > 64 && (fromEnum s) < 91) || ((fromEnum s) > 96 && (fromEnum s) < 123) then (Just s) : (strCheck ss)
+strCheck (s:ss) = if check s then (Just s) : (strCheck ss)
                   else (Nothing) : (strCheck ss)
 
-strCaps :: [Maybe Char] -> [Maybe Char]
+caps :: String -> String
+caps [] = []
+caps (s:ss) = if (fromEnum s) > 96 then (toEnum ((fromEnum s) - 32)) : (caps ss)
+              else s : (caps ss)
+
+strCaps :: [Maybe String] -> [Maybe String]
 strCaps [] = []
 strCaps ((Nothing):ss) = (Nothing) : (strCaps ss)
-strCaps ((Just s):ss) = if (fromEnum s) > 96 then (Just (toEnum ((fromEnum s) - 32))) : (strCaps ss)
-                        else (Just s) : (strCaps ss)
+strCaps ((Just s):ss) = (Just (caps s)) : (strCaps ss)
 
-strPart :: [Maybe Char] -> String
+strPart :: [Maybe String] -> String
 strPart [] = []
 strPart ((Nothing):ss) = ' ' : (strPart ss)
-strPart ((Just s):ss) = s : (strPart ss)
+strPart ((Just s):ss) = s ++ (strPart ss)
 
 main :: IO ()
 main = do {
  input <- getLine;
- mapM_ putStrLn (splitWords $ strPart $ strCaps $ strCheck input);
+ mapM_ putStrLn (splitWords $ strPart $ strCaps $ strCheck $ splitWords input);
  main
 }
