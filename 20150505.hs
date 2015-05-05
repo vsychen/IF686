@@ -54,12 +54,9 @@ strPart [] = []
 strPart ((Nothing):ss) = ' ' : (strPart ss)
 strPart ((Just s):ss) = s : (strPart ss)
 
+main :: IO ()
 main = do {
  input <- getLine;
  mapM_ putStrLn (splitWords $ strPart $ strCaps $ strCheck input);
  main
 }
-
-{- <<path>> --make 20150505.hs
-   20150505.exe
--}
