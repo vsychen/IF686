@@ -1,22 +1,26 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 
-/* Results
+/* Results in millis
 ------------------------------------------------------------------------
 | N\X |   10   |    100    |     1000     |    10000    |    100000    |
 ------------------------------------------------------------------------
-|  1  |
+|  1  |   003  |    003    |     003      |     008     |     086      |
 ------------------------------------------------------------------------
-|  2  |
+|  2  |   003  |    003    |     004      |     009     |     086      |
 ------------------------------------------------------------------------
-|  3  |
+|  3  |   004  |    004    |     004      |     009     |     086      |
 ------------------------------------------------------------------------
-|  4  |
+|  4  |   004  |    004    |     004      |     009     |     086      |
 ------------------------------------------------------------------------
-|  8  |
+|  8  |   004  |    005    |     006      |     011     |     087      |
 ------------------------------------------------------------------------
-| 16  |
+| 16  |   008  |    008    |     009      |     013     |     088      |
 ------------------------------------------------------------------------
+
+Unexpected results
+// N = 8, X = 100. 1st try -> 2ms
+// N = 8, X = 10000. wave between 2~11ms
 */
 
 public class multMatrix {
@@ -29,7 +33,7 @@ public class multMatrix {
     Scanner in = new Scanner(System.in);
     int y = in.nextInt();
     int z = in.nextInt();
-    System.out.println("A primeira matriz terá dimensões " + X + " por " + y + ". A segunda matriz terá dimensões " + y + " por " + z + ". ");
+    System.out.println("A primeira matriz tera dimensoes " + X + " por " + y + ". A segunda matriz tera dimensoes " + y + " por " + z + ". ");
     in.close();
 
     m1 = new Matrix(X, y);
@@ -51,7 +55,7 @@ public class multMatrix {
 
     ArrayList<ThreadSample> al = new ArrayList<ThreadSample>();
     result = new Matrix(X, z);
-	count = X*z;
+    count = X*z;
 
     for(int i = 0; i < N; i++){
       ThreadSample ts = new ThreadSample();
@@ -68,17 +72,16 @@ public class multMatrix {
     }
 
     System.out.println((System.currentTimeMillis() - before) + " ms.");
-    result.print();
   }
-  
+
   public static int calcCoord(Matrix m1, Matrix m2, Point p){
     int retorno = 0;
     int aux = 0;
 
     while(aux < m1.base[0].length){
-      retorno += m1.base[p.x][aux].value + m2.base[aux][p.y].value;
+      retorno += m1.base[p.x][aux].value * m2.base[aux][p.y].value;
       aux++;
-	}
+    }
 
     return retorno;
   }
@@ -98,7 +101,7 @@ class Point {
   
   public Point(int x, int y){
     this.x = x;
-	this.y = y;
+    this.y = y;
   }
 }
 
@@ -108,7 +111,7 @@ class Matrix {
   
   public Matrix (int n, int m){
     this.base = new Node[n][m];
-	this.count = 0;
+    this.count = 0;
 
     for(int i = 0; i < n; i++){
       for(int j = 0; j < m; j++){
@@ -118,8 +121,12 @@ class Matrix {
   }
   
   public synchronized Point getCoord(){
-    Point retorno = new Point(count/(base.length),count%(base.length));
-    this.count++;
+    Point retorno = null;
+
+    if(count < multMatrix.count){
+      retorno = new Point(count/(base[0].length),count%(base[0].length));
+      this.count++;
+    }
 
     return retorno;
   }
@@ -145,7 +152,11 @@ class ThreadSample extends Thread {
   public void run(){
     Point coord = null;
 
-    while(multMatrix.result.count < (multMatrix.count)){
+    while(!interrupted()){
+      if(multMatrix.result.count < (multMatrix.count)){
+        interrupt();
+      }
+
       coord = multMatrix.result.getCoord();
       multMatrix.result.base[coord.x][coord.y].value = multMatrix.calcCoord(multMatrix.m1, multMatrix.m2, coord);
     }
