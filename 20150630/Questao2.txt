@@ -1,15 +1,15 @@
 Universidade Federal de Pernambuco
-Centro de Informática (CIn)
+Centro de Informatica (CIn)
 Alunos: Lucas de Souza Albuquerque e Victor Sin Yu Chen
 Login: lsa2 e vsyc
 
 
 Safety:
   De acordo com esta propriedade, o programa deve ler e escrever corretamente, sendo consistente.
-  Essa caracteristica foi cumprida com o uso de "synchronized" e "Lock", ambos travando a região crítica para que informações desatualizadas não sejam passadas adiante.
-  Para o método obterFicha() também foi utilizado "synchronized" para que a região crítica continuasse consistente.
+  Essa caracteristica foi cumprida com o uso de "synchronized" e "Lock", ambos travando a regiao critica para que informacoes desatualizadas nao sejam passadas adiante.
+  Para o metodo obterFicha() tambem foi utilizado "synchronized" para que a regiao critica continuasse consistente.
 
 Liveness:
-  De acordo com esta propriedade, o programa deve se manter ativo a maior parte do tempo, fazendo a maior quantidade possível de tarefas.
-  Essa característica aparece no programa ao fazê-lo trabalhar paralelarmente nos trechos de código onde não há regiões críticas, adicionando eficiencia ao programa.
-  Para o método obterFicha(), a garantia de que todas as threads irão trabalhar vem com o método sleep(), que apesar de deixar uma thread ociosa por 1ms, no mínimo, possibilita a execução de outra thread.
+  De acordo com esta propriedade, o programa deve se manter ativo a maior parte do tempo, fazendo a maior quantidade possivel de tarefas.
+  Essa caracteristica aparece no programa ao faze-lo trabalhar paralelarmente nos trechos de codigo onde nao ha regioes criticas, adicionando eficiencia ao programa.
+  Para o metodo obterFicha(), a garantia de que todas as threads irao trabalhar vem com o metodo sleep(), que apesar de deixar uma thread ociosa por 1ms, no minimo, possibilita a execucao de outra thread.
