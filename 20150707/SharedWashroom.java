@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Condition;
 
 public class SharedWashroom {
   public static MainThread washroom;
@@ -42,6 +45,8 @@ public class SharedWashroom {
 class MainThread extends Thread {
   public int manI, womanI, manO, womanO; // how many inside/outside
   public volatile boolean genre;         // false (0) = woman; true (1) = man
+  public Lock l;
+  private Condition free;
 
   public MainThread() {
     this.manI = 0;
@@ -49,6 +54,8 @@ class MainThread extends Thread {
 	this.manO = 0;
 	this.womanO = 0;
     this.genre = true;
+	this.l = new ReentrantLock();
+	this.free = l.newCondition();
   }
 
   public void run() {
@@ -62,40 +69,68 @@ class MainThread extends Thread {
         else if (womanO > 2 * manO) genre = false;
       }
 
-      synchronized (this) {
-        notifyAll();
+      l.lock();
+
+      try {
+        free.signalAll();
+      } finally {
+        l.unlock();
       }
     }
   }
   
-  public synchronized void entrarHomem(int id) throws InterruptedException {
-    while (!genre || womanI != 0) {
-      wait();
-    }
+  public void entrarHomem(int id) throws InterruptedException {
+    l.lock();
 
-    manO--;
-	manI++;
-    System.out.println("Homem " + id + " entrou no banheiro");
-  }
-  
-  public synchronized void sairHomem(int id) {
-    manI--;
-    System.out.println("Homem " + id + " saiu do banheiro");
-  }
-  
-  public synchronized void entrarMulher(int id) throws InterruptedException {
-    while (genre || manI != 0) {
-      wait();
-    }
+    try {
+      while (!genre || womanI != 0) {
+        free.await();
+      }
 
-    womanO--;
-	womanI++;
-    System.out.println("Mulher " + id + " entrou no banheiro");
+      manO--;
+	  manI++;
+      System.out.println("Homem " + id + " entrou no banheiro");
+    } finally {
+      l.unlock();
+    }
   }
   
-  public synchronized void sairMulher(int id) {
-    womanI--;
-    System.out.println("Mulher " + id + " saiu do banheiro");
+  public void sairHomem(int id) {
+    l.lock();
+
+    try {
+      manI--;
+      System.out.println("Homem " + id + " saiu do banheiro");
+    } finally {
+      l.unlock();
+    }
+  }
+  
+  public void entrarMulher(int id) throws InterruptedException {
+    l.lock();
+
+    try {
+      while (genre || manI != 0) {
+        free.await();
+      }
+
+      womanO--;
+	  womanI++;
+      System.out.println("Mulher " + id + " entrou no banheiro");
+    } finally {
+      l.unlock();
+    }
+  }
+  
+  public void sairMulher(int id) {
+    l.lock();
+
+    try {
+      womanI--;
+      System.out.println("Mulher " + id + " saiu do banheiro");
+    } finally {
+      l.unlock(); 
+    }
   }
 }
 
@@ -104,9 +139,12 @@ class ManThread extends Thread {
 
   public ManThread(int id) {
     this.id = id;
+    SharedWashroom.washroom.l.lock();
 
-    synchronized (SharedWashroom.washroom) {
+    try {
       SharedWashroom.washroom.manO++;
+    } finally {
+      SharedWashroom.washroom.l.unlock();
     }
   }
 
@@ -124,9 +162,12 @@ class WomanThread extends Thread {
 
   public WomanThread(int id) {
     this.id = id;
+    SharedWashroom.washroom.l.lock();
 
-    synchronized (SharedWashroom.washroom) {
+    try {
       SharedWashroom.washroom.womanO++;
+    } finally {
+      SharedWashroom.washroom.l.unlock();
     }
   }	
 

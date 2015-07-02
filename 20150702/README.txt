@@ -1,0 +1,4 @@
+Explique porque esta implementacao satisfaz exclusao mutua e ausencia de starvation
+
+A exclusao mutua acontece pelo uso do synchronized, que tranca um monitor e nao permite que ninguem mais acesse aquele monitor ate que o synchronized termine ou que o metodo wait() seja chamado.
+Esta implementacao nao possui starvation pois o banheiro regula quem deve ou nao entrar. Ao passar muito tempo sem um tipo de thread entrar, a quantidade destas threads chegara ao dobro da quantidade do outro tipo de thread (nao ha desistencia, e ha paralelismo, entao e garantido que se um tipo de thread nao entra na regiao critica ha muito tempo, o outro tipo entrara e tera sua quantidade reduzida). Ao chegar ao dobro da quantidade do segundo tipo de thread, a regiao critica se abrira para o primeiro tipo de thread, enquanto proibe o segundo tipo.
