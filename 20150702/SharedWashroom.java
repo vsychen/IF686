@@ -4,6 +4,7 @@ public class SharedWashroom {
   public static MainThread washroom;
   public static ArrayList<ManThread> mtl;
   public static ArrayList<WomanThread> wtl;
+  public static boolean noMoreThreads = false;
 
   public static void main(String[] args) {
     mtl = new ArrayList<ManThread>();
@@ -33,133 +34,107 @@ public class SharedWashroom {
       e.printStackTrace();
     }
 
-    washroom.run = false;
+    noMoreThreads = true;
     System.out.println("Banheiro fechado");
   }
 }
 
 class MainThread extends Thread {
-  public volatile int count;
-  public boolean genre;
-  public boolean run;
+  public int manI, womanI, manO, womanO; // how many inside/outside
+  public volatile boolean genre;         // false (0) = woman; true (1) = man
 
   public MainThread() {
-    this.count = 0;
+    this.manI = 0;
+	this.womanI = 0;
+	this.manO = 0;
+	this.womanO = 0;
     this.genre = true;
-    this.run = true;
   }
 
   public void run() {
-    while (run) {
-      if (System.currentTimeMillis()%4 == 0) {
-        while (count != 0) {}
-
-        genre = !genre;
+    while ((manO != 0 || womanO != 0) || !SharedWashroom.noMoreThreads) {
+      if (manO == 0) {
+        genre = false;
+      } else if (womanO == 0) {
+        genre = true;
+      } else {
+        if (manO > 2 * womanO) genre = true;
+        else if (womanO > 2 * manO) genre = false;
       }
 
-      notifyAll();
+      synchronized (this) {
+        notifyAll();
+      }
     }
+  }
+  
+  public synchronized void entrarHomem(int id) throws InterruptedException {
+    while (!genre || womanI != 0) {
+      wait();
+    }
+
+    manO--;
+	manI++;
+    System.out.println("Homem " + id + " entrou no banheiro");
+  }
+  
+  public synchronized void sairHomem(int id) {
+    manI--;
+    System.out.println("Homem " + id + " saiu do banheiro");
+  }
+  
+  public synchronized void entrarMulher(int id) throws InterruptedException {
+    while (genre || manI != 0) {
+      wait();
+    }
+
+    womanO--;
+	womanI++;
+    System.out.println("Mulher " + id + " entrou no banheiro");
+  }
+  
+  public synchronized void sairMulher(int id) {
+    womanI--;
+    System.out.println("Mulher " + id + " saiu do banheiro");
   }
 }
 
 class ManThread extends Thread {
   public int id;
-  public boolean inside;
 
   public ManThread(int id) {
     this.id = id;
-    this.inside = false;
+
+    synchronized (SharedWashroom.washroom) {
+      SharedWashroom.washroom.manO++;
+    }
   }
 
   public void run() {
     try {
-      entrarHomem();
-      sairHomem();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
+      SharedWashroom.washroom.entrarHomem(id);
+    } catch (InterruptedException e) {}
 
-  public void entrarHomem() throws InterruptedException {
-    guard();
-
-    if (!inside) {
-      synchronized (SharedWashroom.washroom) {
-        if (SharedWashroom.washroom.genre) SharedWashroom.washroom.count++;
-        System.out.println("Homem nº " + id + " acabou de entrar no banheiro.");
-      }
-
-      inside = true;
-    }
-  }
-
-  public void sairHomem() {
-    if (inside) {
-      synchronized (SharedWashroom.washroom) {
-        SharedWashroom.washroom.count--;
-        System.out.println("Homem nº " + id + " acabou de sair do banheiro.");
-      }
-
-      inside = false;
-    }
-  }
-
-  public void guard() throws InterruptedException {
-    synchronized (SharedWashroom.washroom) {
-      while (!SharedWashroom.washroom.genre) {
-        wait();
-      }
-    }
+    SharedWashroom.washroom.sairHomem(id);
   }
 }
 
 class WomanThread extends Thread {
   public int id;
-  public boolean inside;
 
   public WomanThread(int id) {
     this.id = id;
-    this.inside = false;
-  }
+
+    synchronized (SharedWashroom.washroom) {
+      SharedWashroom.washroom.womanO++;
+    }
+  }	
 
   public void run() {
     try {
-      entrarMulher();
-      sairMulher();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
+    SharedWashroom.washroom.entrarMulher(id);
+    } catch (InterruptedException e) {}
 
-  public void entrarMulher() throws InterruptedException {
-    guard();
-
-    if (!inside) {
-      synchronized (SharedWashroom.washroom) {
-        if (!SharedWashroom.washroom.genre) SharedWashroom.washroom.count++;
-        System.out.println("Mulher nº " + id + " acabou de entrar no banheiro.");
-      }
-
-      inside = true;
-    }
-  }
-
-  public void sairMulher() {
-    if (inside) {
-      synchronized (SharedWashroom.washroom) {
-        SharedWashroom.washroom.count--;
-        System.out.println("Mulher nº " + id + " acabou de sair do banheiro.");
-      }
-
-      inside = false;
-    }
-  }
-
-  public void guard() throws InterruptedException {
-    synchronized (SharedWashroom.washroom) {
-      while (SharedWashroom.washroom.genre) {
-        wait();
-      }
-    }
+    SharedWashroom.washroom.sairMulher(id);
   }
 }
